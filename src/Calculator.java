@@ -25,13 +25,6 @@ public class Calculator extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Set look and feel to match the OS.
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         // Start the app.
         new Calculator();
     }
