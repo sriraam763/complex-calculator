@@ -1,16 +1,21 @@
+/**
+ * Entry point to the UI of the app.
+ */
+
 package frontend;
 
 import javax.swing.*;
 
 import frontend.input.*;
 import frontend.output.*;
+import ui.Theme;
 
 import java.awt.*;
 
 /**
  * Main window layout.
  */
-public class Home extends JPanel{
+public class Home extends JPanel {
 	public Home() {
 		// Using a GridBagLayout for better flexibility.
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -22,12 +27,15 @@ public class Home extends JPanel{
 		gbc.gridy = 0;
 		gbc.weightx = 1;
 		gbc.weighty = 0.25;
-		add(new Output(), gbc);
+		Output output = new Output();
+		add(output, gbc);
 
 		// Add the input bar for all the buttons.
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weighty = 1;
-		add(new Input(), gbc);
+		add(new Input(output.getTextField()), gbc);
+
+		setBackground(Theme.BG_COLOR);
 	}
 }
