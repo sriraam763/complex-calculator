@@ -89,7 +89,7 @@ public class Parser {
             return new BigDecimal(0);
         }
 
-        textField.setText(ans.toString());
+        textField.setText(Double.toString(ans.doubleValue()));
         return ans;
     }
 
@@ -250,6 +250,20 @@ public class Parser {
                         i += 3;
                         break;
 
+                    // Add the previous answer
+                    case 'A':
+                        if (textField.getText().subSequence(i, i + 3).equals("Ans")) {
+                            if (!expression.isEmpty() && (isNumber(expression.getLast())
+                                    || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
+                                expression.add("x");
+                            }
+                            expression.add("Ans");
+                        } else {
+                            throw new NumberFormatException("Invalid function");
+                        }
+                        i += 2;
+                        break;
+
                     case '(':
                         if (!expression.isEmpty() && (isNumber(expression.getLast())
                                 || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
@@ -348,6 +362,8 @@ public class Parser {
                     result.add(Double.toString(Math.E));
                 } else if (infix[i].equals("-e")) {
                     result.add(Double.toString(-Math.E));
+                } else if (infix[i].equals("Ans")) {
+                    result.add(Double.toString(ans.doubleValue()));
                 }
             } else {
                 while (!stack.isEmpty() && prec(infix[i]) < prec(stack.peek())) {

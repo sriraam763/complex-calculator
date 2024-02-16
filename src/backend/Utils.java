@@ -23,7 +23,7 @@ public class Utils {
      * Non operator values.
      */
     public final static String NON_OPERATORS[] = {
-        ")", "π", "e", "-π", "-e"
+        ")", "π", "e", "-π", "-e", "Ans"
     };
 
     /**
