@@ -26,7 +26,7 @@ public class Input extends JPanel {
 	 * List of all the buttons.
 	 */
 	static final String buttons[] = {
-			"C", "(", ")", "%",
+			"<html>&Pi<html>", "(", ")", "%",
 			"7", "8", "9", "÷",
 			"4", "5", "6", "x",
 			"1", "2", "3", "-",

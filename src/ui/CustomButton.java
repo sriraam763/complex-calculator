@@ -8,7 +8,7 @@ import javax.swing.JButton;
 public class CustomButton extends JButton {
     public CustomButton(String text) {
         super(text);
-        setFont(new Font(Font.MONOSPACED, Font.PLAIN, 28));
+        setFont(new Font(Font.SERIF, Font.PLAIN, 28));
         setForeground(Theme.FG_COLOR);
         setBackground(Theme.TERTAIRY_COLOR);
         setBorder(BorderFactory.createLineBorder(Theme.BG_COLOR));
