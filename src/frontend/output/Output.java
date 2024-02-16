@@ -23,6 +23,8 @@ public class Output extends JPanel {
 	private JTextField textField = Parser.textField;
 	private JScrollBar scrollBar;
 
+	private boolean enterPressed = false;
+
 	public Output() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(Theme.BG_COLOR);
@@ -47,6 +49,13 @@ public class Output extends JPanel {
 		// Used to filter keyboard input to allowed key characters
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					enterPressed = false;
+					System.out.println("Released");
+				}
+			}
+			@Override
 			public void keyTyped(KeyEvent e) {
 				if (!Utils.valInArray((Character)e.getKeyChar(), Utils.ALLOWED_KEYS)) {
 					e.consume(); // Ignore the key
@@ -55,7 +64,9 @@ public class Output extends JPanel {
 
 				Parser.clearOutput();
 
-				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+				if (e.getKeyChar() == KeyEvent.VK_ENTER && !enterPressed) {
+					System.out.println("Pressed");
+					enterPressed = true;
 					Parser.calculate();
 					return;
 				}
