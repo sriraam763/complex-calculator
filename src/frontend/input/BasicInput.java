@@ -6,8 +6,10 @@ package frontend.input;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
+import backend.Parser;
 import backend.Utils;
 import ui.CustomButton;
 import ui.Theme;
@@ -15,34 +17,26 @@ import ui.Theme;
 /**
  * Input panel with all the buttons.
  */
-public class Input extends JPanel {
-	/**
-	 * Used to show the scientific buttons for the calculator when there is enough
-	 * space.
-	 */
-	// private static boolean show_scientific = false;
-
+public class BasicInput extends JPanel {
 	/**
 	 * List of all the buttons.
 	 */
-	static final String buttons[] = {
-			"<html>&Pi<html>", "(", ")", "%",
-			"7", "8", "9", "÷",
-			"4", "5", "6", "x",
-			"1", "2", "3", "-",
-			"0", ".", "=", "+"
+	static final private String buttons[] = {
+			"C", "Ans", "%", "÷",
+			"7", "8", "9", "x",
+			"4", "5", "6", "-",
+			"1", "2", "3", "+",
+			"0", ".", "="
 	};
 
-	private JTextField textField;
+	private JTextField textField = Parser.textField;
 
 	/**
 	 * Array of all the buttons.
 	 */
 	private CustomButton button_arr[] = new CustomButton[buttons.length];
 
-	public Input(JTextField textField) {
-		this.textField = textField;
-
+	public BasicInput() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1;
@@ -56,7 +50,16 @@ public class Input extends JPanel {
 		button_arr[0].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				textField.setText("");
+				Parser.textField.setText("");
+			}
+		});
+
+		// Equal operator function.
+		button_arr[18].removeActionListener(button_arr[18].getActionListeners()[0]);
+		button_arr[18].addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Parser.calculate();
 			}
 		});
 
@@ -66,7 +69,6 @@ public class Input extends JPanel {
 		button_arr[11].setBackground(Theme.PRIMARY_COLOR);
 		button_arr[15].setBackground(Theme.PRIMARY_COLOR);
 		button_arr[18].setBackground(Theme.PRIMARY_COLOR);
-		button_arr[19].setBackground(Theme.PRIMARY_COLOR);
 
 		button_arr[4].setBackground(Theme.SECONDARY_COLOR);
 		button_arr[5].setBackground(Theme.SECONDARY_COLOR);
@@ -80,12 +82,24 @@ public class Input extends JPanel {
 		button_arr[16].setBackground(Theme.SECONDARY_COLOR);
 		button_arr[17].setBackground(Theme.SECONDARY_COLOR);
 
-		for (int i = 0; i < buttons.length; i++) {
+		// button_arr[1].setFont(new Font(Font.MONOSPACED, Font.PLAIN, 18));
+
+		for (int i = 0; i < buttons.length - 3; i++) {
 			gbc.gridx = i % 4;
 			gbc.gridy = i / 4;
 
 			add(button_arr[i], gbc);
 		}
+
+		gbc.gridy++;
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
+		add(button_arr[16], gbc);
+		gbc.gridx += 2;
+		gbc.gridwidth = 1;
+		add(button_arr[17], gbc);
+		gbc.gridx++;
+		add(button_arr[18], gbc);
 
 		setBackground(Theme.BG_COLOR);
 	}
@@ -100,6 +114,8 @@ public class Input extends JPanel {
 			button_arr[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					Parser.clearOutput();
+
 					String text = ((JButton) e.getSource()).getText();
 					textField.setText(textField.getText() + text);
 				}
@@ -108,10 +124,17 @@ public class Input extends JPanel {
 				@Override
 				public void keyTyped(KeyEvent e) {
 					if (!Utils.valInArray((Character) e.getKeyChar(), Utils.ALLOWED_KEYS)) {
+						e.consume();
 						return;
 					}
+
+					Parser.clearOutput();
+
 					if (e.getKeyChar() == KeyEvent.VK_BACK_SPACE && textField.getText().length() > 0) {
-						textField.setText(textField.getText().substring(0, textField.getText().length() - 1));
+						String text = textField.getText();
+						textField.setText(text.substring(0, text.length() - 1));
+					} else if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+						Parser.calculate();
 					} else {
 						switch (e.getKeyChar()) {
 							case '*':

@@ -9,6 +9,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import backend.Parser;
 import backend.Utils;
 import ui.Theme;
 
@@ -16,12 +17,25 @@ import ui.Theme;
  * Shows the calulator output.
  */
 public class Output extends JPanel {
-	JTextField textField = new JTextField();
-	JScrollBar scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+	/**
+	 * Shows the output in the UI
+	 */
+	private JTextField textField = Parser.textField;
+	private JScrollBar scrollBar;
 
 	public Output() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(Theme.BG_COLOR);
+
+		// Set the scroll bar to use the system look and feel
+		LookAndFeel prevLF = UIManager.getLookAndFeel();
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+			UIManager.setLookAndFeel(prevLF);
+		} catch (Exception e) {
+			scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+		}
 
 		textField.setHorizontalAlignment(JTextField.RIGHT);
 		textField.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 38));
@@ -35,8 +49,17 @@ public class Output extends JPanel {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				if (!Utils.valInArray((Character)e.getKeyChar(), Utils.ALLOWED_KEYS)) {
-					e.consume();  // Ignore the key
+					e.consume(); // Ignore the key
+					return;
 				}
+
+				Parser.clearOutput();
+
+				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+					Parser.calculate();
+					return;
+				}
+
 				switch (e.getKeyChar()) {
 					case '*':
 						e.setKeyChar('x');
@@ -44,6 +67,7 @@ public class Output extends JPanel {
 					default:
 						break;
 				}
+
 				super.keyTyped(e);
 			}
 		});
@@ -55,9 +79,5 @@ public class Output extends JPanel {
 
 		add(textField);
 		add(scrollBar);
-	}
-
-	public JTextField getTextField() {
-		return this.textField;
 	}
 }

@@ -34,7 +34,7 @@ public class Home extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weighty = 1;
-		add(new Input(output.getTextField()), gbc);
+		add(new BasicInput(), gbc);
 
 		setBackground(Theme.BG_COLOR);
 	}
