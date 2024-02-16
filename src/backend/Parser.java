@@ -4,7 +4,10 @@
 
 package backend;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 import javax.swing.JTextField;
@@ -20,7 +23,15 @@ public class Parser {
      */
     public static boolean clear_output = false;
 
-    public static double ans = 0;
+    /**
+     * Strores the last result.
+     */
+    public static BigDecimal ans = new BigDecimal(0);
+
+    /**
+     * Flag indicating radians or degrees mode.
+     */
+    public static boolean radians = true;
 
     /**
      * Checks the precedence of the operator
@@ -29,20 +40,8 @@ public class Parser {
      * @return
      */
     private static int prec(String operator) {
-        if (operator.equals("^"))
-            return 6;
-        else if (operator.equals("/"))
-            return 5;
-        else if (operator.equals("%"))
-            return 4;
-        else if (operator.equals("x"))
-            return 3;
-        else if (operator.equals("+"))
-            return 2;
-        else if (operator.equals("-"))
-            return 1;
-        else
-            return -1;
+        String operators[] = { "-", "+", "x", "%", "/", "√", "^", "!", "sin", "cos", "tan", "asin", "acos", "atan" };
+        return Arrays.asList(operators).indexOf(operator);
     }
 
     /**
@@ -67,12 +66,12 @@ public class Parser {
         }
     }
 
-    public static double calculate() {
+    public static BigDecimal calculate() {
         clear_output = true;
         if (textField.getText().isEmpty()) {
-            ans = 0;
-            textField.setText("0");
-            return 0;
+            ans.subtract(ans);
+            textField.setText("");
+            return new BigDecimal(0);
         }
 
         String infix[];
@@ -80,11 +79,17 @@ public class Parser {
             infix = checkSyntaxErrors();
         } catch (NumberFormatException e) {
             textField.setText("Syntax Error!");
-            return 0;
+            return new BigDecimal(0);
         }
 
-        ans = postfixParse(infixToPostfix(infix));
-        textField.setText(Double.toString(ans));
+        try {
+            ans = postfixParse(infixToPostfix(infix));
+        } catch (Exception e) {
+            textField.setText("Math Error!");
+            return new BigDecimal(0);
+        }
+
+        textField.setText(ans.toString());
         return ans;
     }
 
@@ -103,6 +108,12 @@ public class Parser {
             throw new NumberFormatException("Syntax error");
         }
 
+        if (!(isNumber(infix.get(0)) || Utils.valInArray(infix.get(0), Utils.FUNCTIONS)
+                || (Utils.valInArray(infix.get(0), Utils.NON_OPERATORS) && !infix.get(0).equals(")")))) {
+            textField.setText("Syntax Error!");
+            throw new NumberFormatException("Syntax error");
+        }
+
         for (int i = 0; i < infix.size(); i++) {
             if (isNumber(infix.get(i))
                     || (Utils.valInArray(infix.get(i), Utils.NON_OPERATORS) && !infix.get(i).equals(")"))) {
@@ -110,8 +121,10 @@ public class Parser {
                     textField.setText("Syntax Error!");
                     throw new NumberFormatException("Syntax error");
                 }
-            } else if (i > 0 && !isNumber(infix.get(i - 1)) && !Utils.valInArray(infix.get(i - 1), Utils.NON_OPERATORS)
-                    && !Utils.valInArray(infix.get(i), Utils.FUNCTIONS)) {
+            } else if (i > 0 && !isNumber(infix.get(i - 1))
+                    && !Utils.valInArray(infix.get(i - 1), Utils.NON_OPERATORS)
+                    && !Utils.valInArray(infix.get(i), Utils.FUNCTIONS)
+                    && !(infix.get(i).equals("!") && infix.get(i - 1).equals("!"))) {
                 textField.setText("Syntax Error!");
                 throw new NumberFormatException("Syntax error");
             } else if (infix.get(i).equals(".")) {
@@ -316,15 +329,26 @@ public class Parser {
         ArrayList<String> result = new ArrayList<String>();
 
         for (int i = 0; i < infix.length; i++) {
-            if (isNumber(infix[i])) {
+            if (isNumber(infix[i])) { // Check if the element is a number
                 result.add(infix[i]);
             } else if (infix[i].equals("(")) {
                 stack.push(infix[i]);
-            } else if (infix[i].equals(")")) {
+            } else if (infix[i].equals(")")) { // If there is a closing brakcet, pop the stack until an opening bracket
+                                               // is found
                 while (!stack.isEmpty() && !stack.peek().equals("(")) {
                     result.add(stack.pop());
                 }
                 stack.pop();
+            } else if (Utils.valInArray(infix[i], Utils.NON_OPERATORS)) { // Check if the value is Pi or e
+                if (infix[i].equals("π")) {
+                    result.add(Double.toString(Math.PI));
+                } else if (infix[i].equals("-π")) {
+                    result.add(Double.toString(-Math.PI));
+                } else if (infix[i].equals("e")) {
+                    result.add(Double.toString(Math.E));
+                } else if (infix[i].equals("-e")) {
+                    result.add(Double.toString(-Math.E));
+                }
             } else {
                 while (!stack.isEmpty() && prec(infix[i]) < prec(stack.peek())) {
                     result.add(stack.pop());
@@ -334,7 +358,11 @@ public class Parser {
         }
 
         while (!stack.isEmpty()) {
-            result.add(stack.pop());
+            if (!stack.peek().equals("(")) { // Ignore opening brackets when popping the stack
+                result.add(stack.pop());
+            } else {
+                stack.pop();
+            }
         }
 
         String result_2[] = new String[result.size()];
@@ -347,36 +375,144 @@ public class Parser {
      * @param postfix
      * @return
      */
-    public static double postfixParse(String postfix[]) {
-        Stack<Double> stack = new Stack<Double>();
+    public static BigDecimal postfixParse(String postfix[]) throws Exception {
+        Stack<BigDecimal> stack = new Stack<BigDecimal>();
 
         for (int i = 0; i < postfix.length; i++) {
             if (isNumber(postfix[i])) {
-                stack.push(Double.parseDouble(postfix[i]));
-            }
+                stack.push(new BigDecimal(postfix[i]));
+            } else if (Utils.valInArray(postfix[i], Utils.FUNCTIONS) || postfix[i].equals("!")) {
+                BigDecimal num = stack.pop();
+                double value;
 
-            else {
-                double num2 = stack.pop();
-                double num1 = stack.pop();
+                switch (postfix[i]) {
+                    case "sin":
+                        if (!radians) {
+                            num = new BigDecimal(Math.toRadians(num.doubleValue()));
+                        }
+                        value = Math.sin(num.doubleValue());
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "cos":
+                        if (!radians) {
+                            num = new BigDecimal(Math.toRadians(num.doubleValue()));
+                        }
+                        value = Math.cos(num.doubleValue());
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "tan":
+                        if (!radians) {
+                            num = new BigDecimal(Math.toRadians(num.doubleValue()));
+                        }
+                        value = Math.tan(num.doubleValue());
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "asin":
+                        value = Math.asin(num.doubleValue());
+                        if (!radians) {
+                            value = Math.toDegrees(value);
+                            if (Double.isNaN(value)) {
+                                throw new Exception("Math error");
+                            }
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "acos":
+                        value = Math.acos(num.doubleValue());
+                        if (!radians) {
+                            value = Math.toDegrees(value);
+                            if (Double.isNaN(value)) {
+                                throw new Exception("Math error");
+                            }
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "atan":
+                        value = Math.atan(num.doubleValue());
+                        if (!radians) {
+                            value = Math.toDegrees(value);
+                            if (Double.isNaN(value)) {
+                                throw new Exception("Math error");
+                            }
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "ln":
+                        if (num.doubleValue() <= 0) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(Math.log(num.doubleValue())));
+                        break;
+
+                    case "log":
+                        if (num.doubleValue() <= 0) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(Math.log10(num.doubleValue())));
+                        break;
+
+                    case "!":
+                        if (!isInt(num.doubleValue()) || num.doubleValue() < 0) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(factorial(BigInteger.valueOf(Math.round(num.doubleValue())))));
+                        break;
+
+                    default:
+                        break;
+                }
+            } else {
+                BigDecimal num2 = stack.pop();
+                BigDecimal num1 = stack.pop();
 
                 switch (postfix[i]) {
                     case "^":
-                        stack.push(Math.pow(num1, num2));
+                        if (num2.equals(0) && num1.equals(0)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(Math.pow(num1.doubleValue(), num2.doubleValue())));
                         break;
                     case "/":
-                        stack.push(num1 / num2);
+                        if (num2.equals(0)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(num1.divide(num2));
                         break;
                     case "%":
-                        stack.push(num1 % num2);
+                        if (num2.equals(0)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(num1.doubleValue() % num2.doubleValue()));
                         break;
                     case "x":
-                        stack.push(num1 * num2);
+                        stack.push(num1.multiply(num2));
                         break;
                     case "+":
-                        stack.push(num1 + num2);
+                        stack.push(num1.add(num2));
                         break;
                     case "-":
-                        stack.push(num1 - num2);
+                        stack.push(num1.subtract(num2));
+                        break;
+                    case "√":
+                        if (num1.equals(0)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(Math.pow(num2.doubleValue(), 1 / num1.doubleValue())));
                         break;
                     default:
                         break;
@@ -384,6 +520,16 @@ public class Parser {
             }
         }
         return stack.pop();
+    }
 
+    private static boolean isInt(double num) {
+        return num == Math.round(num);
+    }
+
+    public static BigInteger factorial(BigInteger num) {
+        if (num.equals(BigInteger.valueOf(0))) {
+            return BigInteger.valueOf(1);
+        }
+        return num.multiply(factorial(num.subtract(BigInteger.valueOf(1))));
     }
 }
