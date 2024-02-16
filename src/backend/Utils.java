@@ -23,7 +23,14 @@ public class Utils {
      * Non operator values.
      */
     public final static String NON_OPERATORS[] = {
-        ")", "π", "e"
+        ")", "π", "e", "-π", "-e"
+    };
+
+    /**
+     * Array for all functions.
+     */
+    public final static String FUNCTIONS[] = {
+        "tan", "sin", "cos", "atan", "asin", "acos", "ln", "log", "("
     };
 
     /**

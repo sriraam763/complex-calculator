@@ -20,6 +20,8 @@ public class Parser {
      */
     public static boolean clear_output = false;
 
+    public static double ans = 0;
+
     /**
      * Checks the precedence of the operator
      * 
@@ -49,7 +51,7 @@ public class Parser {
      * @param str
      * @return
      */
-    private static boolean isNumber(String str) {
+    public static boolean isNumber(String str) {
         try {
             Double.parseDouble(str);
             return true;
@@ -65,22 +67,25 @@ public class Parser {
         }
     }
 
-    public static void calculate() {
-        // clear_output = true;
-        // if (textField.getText().isEmpty()) {
-        // return;
-        // }
+    public static double calculate() {
+        clear_output = true;
+        if (textField.getText().isEmpty()) {
+            ans = 0;
+            textField.setText("0");
+            return 0;
+        }
 
-        // String infix[] = checkSyntaxErrors(expression);
-        // if (infix.length == 0) {
-        // textField.setText("Syntax Error!");
-        // // return;
-        // }
+        String infix[];
+        try {
+            infix = checkSyntaxErrors();
+        } catch (NumberFormatException e) {
+            textField.setText("Syntax Error!");
+            return 0;
+        }
 
-        // for (String s : expression) {
-        // System.out.printf("%s ", s);
-        // }
-        System.out.println(textField.getText());
+        ans = postfixParse(infixToPostfix(infix));
+        textField.setText(Double.toString(ans));
+        return ans;
     }
 
     /**
@@ -89,8 +94,31 @@ public class Parser {
      * @param expression
      * @return The infix format of the expression.
      */
-    public static String[] checkSyntaxErrors(ArrayList<String> expression) {
-        ArrayList<String> infix = new ArrayList<String>();
+    public static String[] checkSyntaxErrors() throws NumberFormatException {
+        ArrayList<String> infix;
+        try {
+            infix = createExpression();
+        } catch (Exception e) {
+            textField.setText("Syntax Error!");
+            throw new NumberFormatException("Syntax error");
+        }
+
+        for (int i = 0; i < infix.size(); i++) {
+            if (isNumber(infix.get(i))
+                    || (Utils.valInArray(infix.get(i), Utils.NON_OPERATORS) && !infix.get(i).equals(")"))) {
+                if (i > 0 && Utils.valInArray(infix.get(i - 1), Utils.NON_OPERATORS)) {
+                    textField.setText("Syntax Error!");
+                    throw new NumberFormatException("Syntax error");
+                }
+            } else if (i > 0 && !isNumber(infix.get(i - 1)) && !Utils.valInArray(infix.get(i - 1), Utils.NON_OPERATORS)
+                    && !Utils.valInArray(infix.get(i), Utils.FUNCTIONS)) {
+                textField.setText("Syntax Error!");
+                throw new NumberFormatException("Syntax error");
+            } else if (infix.get(i).equals(".")) {
+                textField.setText("Syntax Error!");
+                throw new NumberFormatException("Syntax error");
+            }
+        }
 
         return infix.toArray(new String[infix.size()]);
     }
@@ -121,6 +149,8 @@ public class Parser {
                             (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
                                     && !Utils.valInArray(expression.get(expression.size() - 2), Utils.NON_OPERATORS)
                                     || expression.size() == 1)) { // Check if the last character was -
+                        expression.add(expression.removeLast() + c);
+                    } else if (expression.getLast().equals(".")) {
                         expression.add(expression.removeLast() + c);
                     } else {
                         expression.add(Character.toString(c));
@@ -216,19 +246,51 @@ public class Parser {
                         break;
 
                     case 'π':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
+                        if (!expression.isEmpty()) {
+                            if (isNumber(expression.getLast())
+                                    || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS)) {
+                                expression.add("x");
+                                expression.add("π");
+                            } else if (expression.getLast().equals("-") &&
+                                    (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
+                                            && !Utils.valInArray(expression.get(expression.size() - 2),
+                                                    Utils.NON_OPERATORS)
+                                            || expression.size() == 1)) {
+                                expression.add(expression.removeLast() + "π");
+                            } else {
+                                expression.add("π");
+                            }
+                        } else {
+                            expression.add("π");
                         }
-                        expression.add("π");
                         break;
 
                     case 'e':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
+                        if (!expression.isEmpty()) {
+                            if (isNumber(expression.getLast())
+                                    || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS)) {
+                                expression.add("x");
+                                expression.add("e");
+                            } else if (expression.getLast().equals("-") &&
+                                    (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
+                                            && !Utils.valInArray(expression.get(expression.size() - 2),
+                                                    Utils.NON_OPERATORS)
+                                            || expression.size() == 1)) {
+                                expression.add(expression.removeLast() + "e");
+                            } else {
+                                expression.add("e");
+                            }
+                        } else {
+                            expression.add("e");
                         }
-                        expression.add("e");
+                        break;
+
+                    case '.':
+                        if (!expression.isEmpty() && isNumber(expression.getLast())) {
+                            expression.add(expression.removeLast() + ".");
+                        } else {
+                            expression.add(".");
+                        }
                         break;
 
                     default:
