@@ -19,9 +19,9 @@ public class ButtonTexts {
     public static String e = "e";
     public static String rad = "Rad";
     public static String deg = "Deg";
-    public static String arcsin = "<html>sin<sup style='font-size:20pt'>-1<sup></html>";
-    public static String arccos = "<html>cos<sup style='font-size:20pt'>-1<sup></html>";
-    public static String arctan = "<html>tan<sup style='font-size:20pt'>-1<sup></html>";
+    public static String arcsin = "sinh";
+    public static String arccos = "cosh";
+    public static String arctan = "tanh";
     public static String pi = "π";
     public static String rand = "Rand";
 }
