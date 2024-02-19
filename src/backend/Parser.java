@@ -40,7 +40,7 @@ public class Parser {
      * @return
      */
     private static int prec(String operator) {
-        String operators[] = { "-", "+", "x", "%", "/", "√", "^", "!", "sin", "cos", "tan", "asin", "acos", "atan" };
+        String operators[] = { "-", "+", "x", "%", "/", "√", "^", "!"};
         return Arrays.asList(operators).indexOf(operator);
     }
 
@@ -345,7 +345,7 @@ public class Parser {
         for (int i = 0; i < infix.length; i++) {
             if (isNumber(infix[i])) { // Check if the element is a number
                 result.add(infix[i]);
-            } else if (infix[i].equals("(")) {
+            } else if (Utils.valInArray(infix[i], Utils.FUNCTIONS)) {  // Check if there is a function being used.
                 stack.push(infix[i]);
             } else if (infix[i].equals(")")) { // If there is a closing brakcet, pop the stack until an opening bracket
                                                // is found

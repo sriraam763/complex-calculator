@@ -46,6 +46,8 @@ public class ScientificInput extends JPanel {
 
 		createButtons();
 
+		button_arr[19].setText(Parser.radians ? ButtonTexts.rad : ButtonTexts.deg);
+
 		// Set the rad-deg button
 		button_arr[19].removeActionListener(button_arr[19].getActionListeners()[0]);
 		button_arr[19].addActionListener(new ActionListener() {
