@@ -65,7 +65,6 @@ public class Output extends JPanel {
 
 				if (e.getKeyChar() == KeyEvent.VK_ENTER && i > 2) {
 					i = 0;
-					System.out.println("Pressed");
 					Parser.clearOutput();
 					Parser.calculate();
 				}

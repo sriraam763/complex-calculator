@@ -92,10 +92,6 @@ public class Parser {
         History.storeCalcs.add(textField.getText());
         History.length = History.storeCalcs.size();
 
-        for (String i : History.storeCalcs) {
-            System.out.println(i);
-        }
-
         textField.setText(Double.toString(ans.doubleValue()));
         return ans;
     }
