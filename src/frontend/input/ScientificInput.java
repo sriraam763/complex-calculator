@@ -165,6 +165,9 @@ public class ScientificInput extends JPanel {
 							case '*':
 								e.setKeyChar('x');
 								break;
+							case '/':
+								e.setKeyChar('÷');
+								break;
 							default:
 								break;
 						}
