@@ -40,7 +40,7 @@ public class Parser {
      * @return
      */
     private static int prec(String operator) {
-        String operators[] = { "-", "+", "x", "%", "/", "√", "^", "!"};
+        String operators[] = { "-", "+", "x", "%", "/", "√", "^", "!" };
         return Arrays.asList(operators).indexOf(operator);
     }
 
@@ -179,7 +179,10 @@ public class Parser {
                                 || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
                             expression.add("x");
                         }
-                        if (textField.getText().subSequence(i, i + 3).equals("tan")) {
+                        if (textField.getText().subSequence(i, i + 4).equals("tanh")) {
+                            expression.add("tanh");
+                            i += 3;
+                        } else if (textField.getText().subSequence(i, i + 3).equals("tan")) {
                             expression.add("tan");
                             i += 2;
                         } else {
@@ -193,7 +196,10 @@ public class Parser {
                                 || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
                             expression.add("x");
                         }
-                        if (textField.getText().subSequence(i, i + 3).equals("sin")) {
+                        if (textField.getText().subSequence(i, i + 4).equals("sinh")) {
+                            expression.add("sinh");
+                            i += 3;
+                        } else if (textField.getText().subSequence(i, i + 3).equals("sin")) {
                             expression.add("sin");
                             i += 2;
                         } else {
@@ -207,7 +213,10 @@ public class Parser {
                                 || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
                             expression.add("x");
                         }
-                        if (textField.getText().subSequence(i, i + 3).equals("cos")) {
+                        if (textField.getText().subSequence(i, i + 4).equals("cosh")) {
+                            expression.add("cosh");
+                            i += 3;
+                        } else if (textField.getText().subSequence(i, i + 3).equals("cos")) {
                             expression.add("cos");
                             i += 2;
                         } else {
@@ -238,16 +247,27 @@ public class Parser {
                                 || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
                             expression.add("x");
                         }
-                        if (textField.getText().subSequence(i, i + 4).equals("atan")) {
+                        if (textField.getText().subSequence(i, i + 5).equals("atanh")) {
+                            expression.add("atanh");
+                            i += 4;
+                        } else if (textField.getText().subSequence(i, i + 5).equals("asinh")) {
+                            expression.add("asinh");
+                            i += 4;
+                        } else if (textField.getText().subSequence(i, i + 5).equals("acosh")) {
+                            expression.add("acosh");
+                            i += 4;
+                        } else if (textField.getText().subSequence(i, i + 4).equals("atan")) {
                             expression.add("atan");
+                            i += 3;
                         } else if (textField.getText().subSequence(i, i + 4).equals("asin")) {
                             expression.add("asin");
+                            i += 3;
                         } else if (textField.getText().subSequence(i, i + 4).equals("acos")) {
                             expression.add("acos");
+                            i += 3;
                         } else {
                             throw new NumberFormatException("Invalid function");
                         }
-                        i += 3;
                         break;
 
                     // Add the previous answer
@@ -345,7 +365,7 @@ public class Parser {
         for (int i = 0; i < infix.length; i++) {
             if (isNumber(infix[i])) { // Check if the element is a number
                 result.add(infix[i]);
-            } else if (Utils.valInArray(infix[i], Utils.FUNCTIONS)) {  // Check if there is a function being used.
+            } else if (Utils.valInArray(infix[i], Utils.FUNCTIONS)) { // Check if there is a function being used.
                 stack.push(infix[i]);
             } else if (infix[i].equals(")")) { // If there is a closing brakcet, pop the stack until an opening bracket
                                                // is found
@@ -468,6 +488,54 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
+                    case "sinh":
+                        value = Math.sinh(num.doubleValue());
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "cosh":
+                        value = Math.cosh(num.doubleValue());
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "tanh":
+                        value = Math.tanh(num.doubleValue());
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "asinh":
+                        value = Math.log(num.doubleValue() + Math.sqrt(num.pow(2).doubleValue() + 1));
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "acosh":
+                        value = Math.log(num.doubleValue() + Math.sqrt(num.pow(2).doubleValue() - 1));
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
+
+                    case "atanh":
+  
+                        value = 0.5 * Math.log((1 + num.doubleValue())/(1-num.doubleValue()));
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(new BigDecimal(value));
+                        break;
                     case "ln":
                         if (num.doubleValue() <= 0) {
                             throw new Exception("Math error");
@@ -498,19 +566,19 @@ public class Parser {
 
                 switch (postfix[i]) {
                     case "^":
-                        if (num2.equals(0) && num1.equals(0)) {
+                        if (num2.equals(BigDecimal.valueOf(0)) && num1.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(Math.pow(num1.doubleValue(), num2.doubleValue())));
                         break;
                     case "/":
-                        if (num2.equals(0)) {
+                        if (num2.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
                         }
                         stack.push(num1.divide(num2));
                         break;
                     case "%":
-                        if (num2.equals(0)) {
+                        if (num2.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(num1.doubleValue() % num2.doubleValue()));
@@ -525,7 +593,7 @@ public class Parser {
                         stack.push(num1.subtract(num2));
                         break;
                     case "√":
-                        if (num1.equals(0)) {
+                        if (num1.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(Math.pow(num2.doubleValue(), 1 / num1.doubleValue())));

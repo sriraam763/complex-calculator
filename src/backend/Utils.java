@@ -11,31 +11,32 @@ import java.awt.event.KeyEvent;
  */
 public class Utils {
     /**
-	 * Array of allowed keys that can be input.
-	 */
-	public final static Character ALLOWED_KEYS[] = {
-        '%', '+', '-', '/', 'x', '*', '(', ')', '^',
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-        KeyEvent.VK_BACK_SPACE, KeyEvent.VK_ENTER
+     * Array of allowed keys that can be input.
+     */
+    public final static Character ALLOWED_KEYS[] = {
+            '%', '+', '-', '/', 'x', '*', '(', ')', '^',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.',
+            KeyEvent.VK_BACK_SPACE, KeyEvent.VK_ENTER
     };
 
     /**
      * Non operator values.
      */
     public final static String NON_OPERATORS[] = {
-        ")", "π", "e", "-π", "-e", "Ans"
+            ")", "π", "e", "-π", "-e", "Ans"
     };
 
     /**
      * Array for all functions.
      */
     public final static String FUNCTIONS[] = {
-        "tan", "sin", "cos", "atan", "asin", "acos", "ln", "log", "("
+            "tan", "sin", "cos", "atan", "asin", "acos", "ln", "log", "(", "tanh", "sinh", "cosh", "atanh", "asinh",
+            "acosh"
     };
 
     /**
      * Check if a value is in an array.
-
+     * 
      */
     public static <T> boolean valInArray(T val, T[] arr) {
         for (int i = 0; i < arr.length; i++) {
