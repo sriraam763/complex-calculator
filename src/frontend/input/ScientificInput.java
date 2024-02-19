@@ -18,16 +18,32 @@ public class ScientificInput extends JPanel {
 			"(", ")", ButtonTexts.x_sqr, ButtonTexts.x_cube, ButtonTexts.pow,
 			ButtonTexts.inverse, ButtonTexts.squareroot, ButtonTexts.cuberoot, ButtonTexts.yroot, ButtonTexts.factorial,
 			ButtonTexts.ln, ButtonTexts.log, ButtonTexts.e_pow, ButtonTexts.ten_pow, ButtonTexts.e,
-			ButtonTexts.pi, ButtonTexts.sin, ButtonTexts.cos, ButtonTexts.tan,
-			ButtonTexts.rad, ButtonTexts.arcsin, ButtonTexts.arccos, ButtonTexts.arctan
+			ButtonTexts.shift, ButtonTexts.pi, ButtonTexts.sin, ButtonTexts.cos, ButtonTexts.tan,
+			ButtonTexts.rad, ButtonTexts.sinh, ButtonTexts.cosh, ButtonTexts.tanh
 	};
 
-	private static final String text[] = {
-		"(", ")", "^2", "^3", "^",
-		"^-1", "2√", "3√", "√", "!",
-		"ln(", "log(", "e^", "10^", "e",
-		"π", "sin(", "cos(", "tan(",
-		"rad", "asin(", "acos(", "atan(",
+	private static boolean shiftDown = false;
+
+	/**
+	 * List of strings to substitute button input with.
+	 */
+	private static final String substituteText[] = {
+			"(", ")", "^2", "^3", "^",
+			"^-1", "2√", "3√", "√", "!",
+			"ln(", "log(", "e^", "10^", "e",
+			"", "π", "sin(", "cos(", "tan(",
+			"rad", "sinh(", "cosh(", "tanh(",
+	};
+
+	/**
+	 * List of strings to substitute button input with when SHIFT key down.
+	 */
+	private static final String substituteTextShifted[] = {
+			"(", ")", "^2", "^3", "^",
+			"^-1", "2√", "3√", "√", "!",
+			"ln(", "log(", "e^", "10^", "e",
+			"", "π", "asin(", "acos(", "atan(",
+			"rad", "asinh(", "acosh(", "atanh(",
 	};
 
 	private JTextField textField = Parser.textField;
@@ -46,53 +62,73 @@ public class ScientificInput extends JPanel {
 
 		createButtons();
 
-		button_arr[19].setText(Parser.radians ? ButtonTexts.rad : ButtonTexts.deg);
+		if (shiftDown) {
+			button_arr[17].setText(ButtonTexts.arcsin);
+			button_arr[18].setText(ButtonTexts.arccos);
+			button_arr[19].setText(ButtonTexts.arctan);
+			button_arr[21].setText(ButtonTexts.arcsinh);
+			button_arr[22].setText(ButtonTexts.arccosh);
+			button_arr[23].setText(ButtonTexts.arctanh);
+		}
+
+		button_arr[20].setText(Parser.radians ? ButtonTexts.rad : ButtonTexts.deg);
 
 		// Set the rad-deg button
-		button_arr[19].removeActionListener(button_arr[19].getActionListeners()[0]);
-		button_arr[19].addActionListener(new ActionListener() {
+		button_arr[20].removeActionListener(button_arr[20].getActionListeners()[0]);
+		button_arr[20].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Parser.radians = !Parser.radians;
 				if (Parser.radians) {
-					button_arr[19].setText(ButtonTexts.rad);
+					button_arr[20].setText(ButtonTexts.rad);
 				} else {
-					button_arr[19].setText(ButtonTexts.deg);
+					button_arr[20].setText(ButtonTexts.deg);
 				}
 			}
 		});
 
-		for (int i = 0; i < button_arr.length-8; i++) {
-			gbc.gridx = i%5;
-			gbc.gridy = i/5;
+		// Set the shift button
+		button_arr[15].removeActionListener(button_arr[15].getActionListeners()[0]);
+		button_arr[15].addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				shiftDown = !shiftDown;
+				if (shiftDown) {
+					button_arr[17].setText(ButtonTexts.arcsin);
+					button_arr[18].setText(ButtonTexts.arccos);
+					button_arr[19].setText(ButtonTexts.arctan);
+					button_arr[21].setText(ButtonTexts.arcsinh);
+					button_arr[22].setText(ButtonTexts.arccosh);
+					button_arr[23].setText(ButtonTexts.arctanh);
+				} else {
+					button_arr[17].setText(ButtonTexts.sin);
+					button_arr[18].setText(ButtonTexts.cos);
+					button_arr[19].setText(ButtonTexts.tan);
+					button_arr[21].setText(ButtonTexts.sinh);
+					button_arr[22].setText(ButtonTexts.cosh);
+					button_arr[23].setText(ButtonTexts.tanh);
+				}
+			}
+		});
+
+		for (int i = 0; i < button_arr.length - 4; i++) {
+			gbc.gridx = i % 5;
+			gbc.gridy = i / 5;
 			add(button_arr[i], gbc);
 		}
 
 		gbc.gridy++;
 		gbc.gridx = 0;
 		gbc.gridwidth = 2;
-		add(button_arr[15], gbc);
-
-		gbc.gridx += 2;
-		gbc.gridwidth = 1;
-		add(button_arr[16], gbc);
-		gbc.gridx++;
-		add(button_arr[17], gbc);
-		gbc.gridx++;
-		add(button_arr[18], gbc);
-
-		gbc.gridy++;
-		gbc.gridx = 0;
-		gbc.gridwidth = 2;
-		add(button_arr[19], gbc);
-
-		gbc.gridx += 2;
-		gbc.gridwidth = 1;
 		add(button_arr[20], gbc);
-		gbc.gridx++;
+
+		gbc.gridx += 2;
+		gbc.gridwidth = 1;
 		add(button_arr[21], gbc);
 		gbc.gridx++;
 		add(button_arr[22], gbc);
+		gbc.gridx++;
+		add(button_arr[23], gbc);
 
 		setBackground(Theme.BG_COLOR);
 	}
@@ -105,7 +141,8 @@ public class ScientificInput extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Parser.clearOutput();
-					textField.setText(textField.getText() + text[index]);
+					textField.setText(
+							textField.getText() + (shiftDown ? substituteTextShifted[index] : substituteText[index]));
 				}
 			});
 			button_arr[i].addKeyListener(new KeyAdapter() {
