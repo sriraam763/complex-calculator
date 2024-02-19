@@ -9,6 +9,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import backend.History;
 import backend.Parser;
 import backend.Utils;
 import ui.Theme;
@@ -23,7 +24,8 @@ public class Output extends JPanel {
 	private JTextField textField = Parser.textField;
 	private JScrollBar scrollBar;
 
-	private boolean enterPressed = false;
+	static int i = 0;
+	static int current_index = 15;
 
 	public Output() {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -49,35 +51,63 @@ public class Output extends JPanel {
 		// Used to filter keyboard input to allowed key characters
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					enterPressed = false;
-					System.out.println("Released");
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_UP && i > 2 && ((current_index < 15 && current_index > 0)
+						|| (textField.getText().isEmpty() && current_index == 15)) && History.length > 0) {
+					i = 0;
+					if (current_index >= 15) {
+						current_index = History.length - 1;
+					} else {
+						current_index--;
+					}
+					textField.setText(History.storeCalcs.get(current_index));
 				}
+
+				if (e.getKeyChar() == KeyEvent.VK_ENTER && i > 2) {
+					i = 0;
+					System.out.println("Pressed");
+					Parser.clearOutput();
+					Parser.calculate();
+				}
+
+				if (e.getKeyCode() == KeyEvent.VK_DOWN && i > 2 && current_index < 15 && current_index >= 0) {
+					current_index++;
+					if (current_index < History.length) {
+						textField.setText(History.storeCalcs.get(current_index));
+					} else {
+						textField.setText("");
+						current_index = 15;
+					}
+					i = 0;
+				}
+
+				i++;
+				super.keyPressed(e);
 			}
+
 			@Override
 			public void keyTyped(KeyEvent e) {
-				if (!Utils.valInArray((Character)e.getKeyChar(), Utils.ALLOWED_KEYS)) {
+				if (!Utils.valInArray((Character) e.getKeyChar(), Utils.ALLOWED_KEYS)) {
 					e.consume(); // Ignore the key
 					return;
 				}
 
-				Parser.clearOutput();
-
-				if (e.getKeyChar() == KeyEvent.VK_ENTER && !enterPressed) {
-					System.out.println("Pressed");
-					enterPressed = true;
-					Parser.calculate();
-					return;
+				if (e.getKeyChar() != KeyEvent.VK_ENTER) {
+					Parser.clearOutput();
 				}
 
 				switch (e.getKeyChar()) {
 					case '*':
 						e.setKeyChar('x');
 						break;
+					case '/':
+						e.setKeyChar('÷');
+						break;
 					default:
 						break;
 				}
+
+				current_index = 15;
 
 				super.keyTyped(e);
 			}

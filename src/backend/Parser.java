@@ -89,6 +89,13 @@ public class Parser {
             return new BigDecimal(0);
         }
 
+        History.storeCalcs.add(textField.getText());
+        History.length = History.storeCalcs.size();
+
+        for (String i : History.storeCalcs) {
+            System.out.println(i);
+        }
+
         textField.setText(Double.toString(ans.doubleValue()));
         return ans;
     }
@@ -529,8 +536,8 @@ public class Parser {
                         break;
 
                     case "atanh":
-  
-                        value = 0.5 * Math.log((1 + num.doubleValue())/(1-num.doubleValue()));
+
+                        value = 0.5 * Math.log((1 + num.doubleValue()) / (1 - num.doubleValue()));
                         if (Double.isNaN(value)) {
                             throw new Exception("Math error");
                         }
@@ -577,6 +584,14 @@ public class Parser {
                         }
                         stack.push(num1.divide(num2));
                         break;
+
+                    case "÷":
+                        if (num2.equals(BigDecimal.valueOf(0))) {
+                            throw new Exception("Math error");
+                        }
+                        stack.push(num1.divide(num2));
+                        break;
+
                     case "%":
                         if (num2.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
