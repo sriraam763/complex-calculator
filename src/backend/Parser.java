@@ -6,6 +6,7 @@ package backend;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
@@ -90,6 +91,9 @@ public class Parser {
         }
 
         History.storeCalcs.add(textField.getText());
+        if (History.storeCalcs.size() > 15) {
+            History.storeCalcs.removeFirst();
+        }
         History.length = History.storeCalcs.size();
 
         textField.setText(Double.toString(ans.doubleValue()));
@@ -173,7 +177,8 @@ public class Parser {
                             expression.add(expression.removeLast() + c);
                         }
                     } else if (expression.getLast().equals(".") || expression.getLast().equals("-.")) {
-                        // Make sure the first character is a number or a function, for an constant and not equal to ")".
+                        // Make sure the first character is a number or a function, for an constant and
+                        // not equal to ")".
                         expression.add(expression.removeLast() + c);
                     } else {
                         expression.add(Character.toString(c));
@@ -204,9 +209,12 @@ public class Parser {
                             || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
                         expression.add("x");
                     } else if (!expression.isEmpty() && expression.getLast().equals("-")) {
-                        expression.removeLast();  // Remove the last - symbol
+                        expression.removeLast(); // Remove the last - symbol
                         // Substitute + -1 x func instead of -func
-                        if (!expression.isEmpty() && (isNumber(expression.getLast()) || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {  // Only add the + if there are more than one element.
+                        if (!expression.isEmpty() && (isNumber(expression.getLast())
+                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) { // Only add the + if
+                                                                                                   // there are more
+                                                                                                   // than one element.
                             expression.add("+");
                         }
                         expression.add("-1");
@@ -245,9 +253,10 @@ public class Parser {
                             || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
                         expression.add("x");
                     } else if (!expression.isEmpty() && expression.getLast().equals("-")) {
-                        expression.removeLast();  // Remove the last - symbol
+                        expression.removeLast(); // Remove the last - symbol
                         // Substitute + -1 x func instead of -func
-                        if (!expression.isEmpty() && isNumber(expression.getLast())) {  // Only add the + if there are more than one element.
+                        if (!expression.isEmpty() && isNumber(expression.getLast())) { // Only add the + if there are
+                                                                                       // more than one element.
                             expression.add("+");
                         }
                         expression.add("-1");
@@ -514,14 +523,14 @@ public class Parser {
                         if (num2.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
                         }
-                        stack.push(num1.divide(num2));
+                        stack.push(num1.divide(num2, 11, RoundingMode.HALF_EVEN));
                         break;
 
                     case "÷":
                         if (num2.equals(BigDecimal.valueOf(0))) {
                             throw new Exception("Math error");
                         }
-                        stack.push(num1.divide(num2));
+                        stack.push(num1.divide(num2, 11, RoundingMode.HALF_EVEN));
                         break;
 
                     case "%":
