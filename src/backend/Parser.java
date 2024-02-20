@@ -66,7 +66,7 @@ public class Parser {
         }
     }
 
-    public static BigDecimal calculate() {
+    public static BigDecimal calculate() throws NumberFormatException {
         clear_output = true;
         if (textField.getText().isEmpty()) {
             ans.subtract(ans);
@@ -79,14 +79,14 @@ public class Parser {
             infix = checkSyntaxErrors();
         } catch (NumberFormatException e) {
             textField.setText("Syntax Error!");
-            return new BigDecimal(0);
+            throw new NumberFormatException("Syntax error");
         }
 
         try {
             ans = postfixParse(infixToPostfix(infix));
         } catch (Exception e) {
             textField.setText("Math Error!");
-            return new BigDecimal(0);
+            throw new NumberFormatException("Math error");
         }
 
         History.storeCalcs.add(textField.getText());
@@ -156,17 +156,24 @@ public class Parser {
         int i = 0;
         while (i < input.length) {
             char c = input[i];
+            // Detected a number character.
             if (isNumber(Character.toString(c))) {
-                // Check if the last element was a number or not
+                // Check if the last element before was a number or not.
                 if (!expression.isEmpty()) {
                     if (isNumber(expression.getLast())) {
                         expression.add(expression.removeLast() + c);
-                    } else if (expression.getLast().equals("-") &&
-                            (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
-                                    && !Utils.valInArray(expression.get(expression.size() - 2), Utils.NON_OPERATORS)
-                                    || expression.size() == 1)) { // Check if the last character was -
-                        expression.add(expression.removeLast() + c);
-                    } else if (expression.getLast().equals(".")) {
+                    } else if (expression.getLast().equals("-")) {
+                        // Check if the last character was - and make the number negative.
+                        expression.removeLast();
+                        if (!expression.isEmpty() && (isNumber(expression.getLast())
+                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
+                            expression.add("+");
+                            expression.add("-" + c);
+                        } else {
+                            expression.add(expression.removeLast() + c);
+                        }
+                    } else if (expression.getLast().equals(".") || expression.getLast().equals("-.")) {
+                        // Make sure the first character is a number or a function, for an constant and not equal to ")".
                         expression.add(expression.removeLast() + c);
                     } else {
                         expression.add(Character.toString(c));
@@ -175,168 +182,91 @@ public class Parser {
                     expression.add(Character.toString(c));
                 }
             } else {
+                // Determine if the character is part of a function.
+                String func = "";
+                for (String function : Utils.FUNCTIONS) {
+                    try {
+                        if (textField.getText().subSequence(i, i + function.length()).equals(function)) {
+                            i += function.length();
+                            func = function;
+                        }
+                    } catch (Exception e) {
+                    }
+                    // Exit the loop is a match was found.
+                    if (!func.isEmpty()) {
+                        break;
+                    }
+                }
+
+                // Check if a function was found.
+                if (!func.isEmpty()) {
+                    if (!expression.isEmpty() && (isNumber(expression.getLast())
+                            || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
+                        expression.add("x");
+                    } else if (!expression.isEmpty() && expression.getLast().equals("-")) {
+                        expression.removeLast();  // Remove the last - symbol
+                        // Substitute + -1 x func instead of -func
+                        if (!expression.isEmpty() && (isNumber(expression.getLast()) || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {  // Only add the + if there are more than one element.
+                            expression.add("+");
+                        }
+                        expression.add("-1");
+                        expression.add("x");
+                    }
+                    expression.add(func);
+                    continue;
+                }
+
+                // Check if a constant was found.
+                String constants[] = { "Ans", "e", "π" };
+                for (String constant : constants) {
+                    try {
+                        if (textField.getText().subSequence(i, i + constant.length()).equals(constant)) {
+                            if (!expression.isEmpty() && expression.getLast().equals("-") &&
+                                    (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
+                                            && !Utils.valInArray(expression.get(expression.size() - 2),
+                                                    Utils.NON_OPERATORS)
+                                            || expression.size() == 1)) {
+                                func = expression.removeLast() + constant;
+                            } else {
+                                func = constant;
+                            }
+                            i += constant.length();
+                        }
+                    } catch (Exception e) {
+                    }
+                    // Exit if a match was found.
+                    if (!func.isEmpty()) {
+                        break;
+                    }
+                }
+
+                if (!func.isEmpty()) {
+                    if (!expression.isEmpty() && (isNumber(expression.getLast())
+                            || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
+                        expression.add("x");
+                    } else if (!expression.isEmpty() && expression.getLast().equals("-")) {
+                        expression.removeLast();  // Remove the last - symbol
+                        // Substitute + -1 x func instead of -func
+                        if (!expression.isEmpty() && isNumber(expression.getLast())) {  // Only add the + if there are more than one element.
+                            expression.add("+");
+                        }
+                        expression.add("-1");
+                        expression.add("x");
+                    }
+                    expression.add(func);
+                    continue;
+                }
+
+                // Check if the string is a constant (pi or e) or Ans or .
                 switch (c) {
-                    // Tangent
-                    case 't':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
-                        }
-                        if (textField.getText().subSequence(i, i + 4).equals("tanh")) {
-                            expression.add("tanh");
-                            i += 3;
-                        } else if (textField.getText().subSequence(i, i + 3).equals("tan")) {
-                            expression.add("tan");
-                            i += 2;
-                        } else {
-                            throw new NumberFormatException("Invalid function");
-                        }
-                        break;
-
-                    // Sine
-                    case 's':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
-                        }
-                        if (textField.getText().subSequence(i, i + 4).equals("sinh")) {
-                            expression.add("sinh");
-                            i += 3;
-                        } else if (textField.getText().subSequence(i, i + 3).equals("sin")) {
-                            expression.add("sin");
-                            i += 2;
-                        } else {
-                            throw new NumberFormatException("Invalid function");
-                        }
-                        break;
-
-                    // Cosine
-                    case 'c':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
-                        }
-                        if (textField.getText().subSequence(i, i + 4).equals("cosh")) {
-                            expression.add("cosh");
-                            i += 3;
-                        } else if (textField.getText().subSequence(i, i + 3).equals("cos")) {
-                            expression.add("cos");
-                            i += 2;
-                        } else {
-                            throw new NumberFormatException("Invalid function");
-                        }
-                        break;
-
-                    // Ln or Log
-                    case 'l':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
-                        }
-                        if (textField.getText().substring(i, i + 2).equals("ln")) {
-                            expression.add("ln");
-                            i++;
-                        } else if (textField.getText().substring(i, i + 3).equals("log")) {
-                            expression.add("log");
-                            i += 2;
-                        } else {
-                            throw new NumberFormatException("Invalid function");
-                        }
-                        break;
-
-                    // Arcsin, arctan, arccos
-                    case 'a':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
-                        }
-                        if (textField.getText().subSequence(i, i + 5).equals("atanh")) {
-                            expression.add("atanh");
-                            i += 4;
-                        } else if (textField.getText().subSequence(i, i + 5).equals("asinh")) {
-                            expression.add("asinh");
-                            i += 4;
-                        } else if (textField.getText().subSequence(i, i + 5).equals("acosh")) {
-                            expression.add("acosh");
-                            i += 4;
-                        } else if (textField.getText().subSequence(i, i + 4).equals("atan")) {
-                            expression.add("atan");
-                            i += 3;
-                        } else if (textField.getText().subSequence(i, i + 4).equals("asin")) {
-                            expression.add("asin");
-                            i += 3;
-                        } else if (textField.getText().subSequence(i, i + 4).equals("acos")) {
-                            expression.add("acos");
-                            i += 3;
-                        } else {
-                            throw new NumberFormatException("Invalid function");
-                        }
-                        break;
-
-                    // Add the previous answer
-                    case 'A':
-                        if (textField.getText().subSequence(i, i + 3).equals("Ans")) {
-                            if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                    || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                                expression.add("x");
-                            }
-                            expression.add("Ans");
-                        } else {
-                            throw new NumberFormatException("Invalid function");
-                        }
-                        i += 2;
-                        break;
-
-                    case '(':
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
-                            expression.add("x");
-                        }
-                        expression.add("(");
-                        break;
-
-                    case 'π':
-                        if (!expression.isEmpty()) {
-                            if (isNumber(expression.getLast())
-                                    || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS)) {
-                                expression.add("x");
-                                expression.add("π");
-                            } else if (expression.getLast().equals("-") &&
-                                    (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
-                                            && !Utils.valInArray(expression.get(expression.size() - 2),
-                                                    Utils.NON_OPERATORS)
-                                            || expression.size() == 1)) {
-                                expression.add(expression.removeLast() + "π");
-                            } else {
-                                expression.add("π");
-                            }
-                        } else {
-                            expression.add("π");
-                        }
-                        break;
-
-                    case 'e':
-                        if (!expression.isEmpty()) {
-                            if (isNumber(expression.getLast())
-                                    || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS)) {
-                                expression.add("x");
-                                expression.add("e");
-                            } else if (expression.getLast().equals("-") &&
-                                    (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
-                                            && !Utils.valInArray(expression.get(expression.size() - 2),
-                                                    Utils.NON_OPERATORS)
-                                            || expression.size() == 1)) {
-                                expression.add(expression.removeLast() + "e");
-                            } else {
-                                expression.add("e");
-                            }
-                        } else {
-                            expression.add("e");
-                        }
-                        break;
-
                     case '.':
                         if (!expression.isEmpty() && isNumber(expression.getLast())) {
+                            expression.add(expression.removeLast() + ".");
+                        } else if (!expression.isEmpty() && expression.getLast().equals("-") &&
+                                (expression.size() > 1 && !isNumber(expression.get(expression.size() - 2))
+                                        && !Utils.valInArray(expression.get(expression.size() - 2),
+                                                Utils.NON_OPERATORS)
+                                        || expression.size() == 1)) {
                             expression.add(expression.removeLast() + ".");
                         } else {
                             expression.add(".");
@@ -376,6 +306,10 @@ public class Parser {
                     result.add(stack.pop());
                 }
                 stack.pop();
+                // Check if the brackets are part of a function
+                if (!stack.isEmpty() && Utils.valInArray(stack.peek(), Utils.FUNCTIONS) && !stack.peek().equals("(")) {
+                    result.add(stack.pop());
+                }
             } else if (Utils.valInArray(infix[i], Utils.NON_OPERATORS)) { // Check if the value is Pi or e
                 if (infix[i].equals("π")) {
                     result.add(Double.toString(Math.PI));
@@ -387,6 +321,8 @@ public class Parser {
                     result.add(Double.toString(-Math.E));
                 } else if (infix[i].equals("Ans")) {
                     result.add(Double.toString(ans.doubleValue()));
+                } else if (infix[i].equals("-Ans")) {
+                    result.add(Double.toString(-ans.doubleValue()));
                 }
             } else {
                 while (!stack.isEmpty() && prec(infix[i]) < prec(stack.peek())) {
@@ -532,13 +468,13 @@ public class Parser {
                         break;
 
                     case "atanh":
-
                         value = 0.5 * Math.log((1 + num.doubleValue()) / (1 - num.doubleValue()));
                         if (Double.isNaN(value)) {
                             throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(value));
                         break;
+
                     case "ln":
                         if (num.doubleValue() <= 0) {
                             throw new Exception("Math error");
@@ -561,7 +497,7 @@ public class Parser {
                         break;
 
                     default:
-                        break;
+                        throw new Exception("Syntax error");
                 }
             } else {
                 BigDecimal num2 = stack.pop();
@@ -621,7 +557,7 @@ public class Parser {
         return num == Math.round(num);
     }
 
-    public static BigInteger factorial(BigInteger num) {
+    private static BigInteger factorial(BigInteger num) {
         if (num.equals(BigInteger.valueOf(0))) {
             return BigInteger.valueOf(1);
         }
