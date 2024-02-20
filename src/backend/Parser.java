@@ -164,9 +164,9 @@ public class Parser {
                         expression.add(expression.removeLast() + c);
                     } else if (expression.getLast().equals("-")) {
                         // Check if the last character was - and make the number negative.
-                        expression.removeLast();
-                        if (!expression.isEmpty() && (isNumber(expression.getLast())
-                                || Utils.valInArray(expression.getLast(), Utils.NON_OPERATORS))) {
+                        if (expression.size() > 1 && (isNumber(expression.get(expression.size() - 2))
+                                || Utils.valInArray(expression.get(expression.size() - 2), Utils.NON_OPERATORS))) {
+                            expression.removeLast();
                             expression.add("+");
                             expression.add("-" + c);
                         } else {
@@ -398,9 +398,9 @@ public class Parser {
                         value = Math.asin(num.doubleValue());
                         if (!radians) {
                             value = Math.toDegrees(value);
-                            if (Double.isNaN(value)) {
-                                throw new Exception("Math error");
-                            }
+                        }
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(value));
                         break;
@@ -409,9 +409,9 @@ public class Parser {
                         value = Math.acos(num.doubleValue());
                         if (!radians) {
                             value = Math.toDegrees(value);
-                            if (Double.isNaN(value)) {
-                                throw new Exception("Math error");
-                            }
+                        }
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(value));
                         break;
@@ -420,9 +420,9 @@ public class Parser {
                         value = Math.atan(num.doubleValue());
                         if (!radians) {
                             value = Math.toDegrees(value);
-                            if (Double.isNaN(value)) {
-                                throw new Exception("Math error");
-                            }
+                        }
+                        if (Double.isNaN(value)) {
+                            throw new Exception("Math error");
                         }
                         stack.push(new BigDecimal(value));
                         break;
