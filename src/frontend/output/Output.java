@@ -99,9 +99,6 @@ public class Output extends JPanel {
 					case '*':
 						e.setKeyChar('x');
 						break;
-					case '/':
-						e.setKeyChar('÷');
-						break;
 					default:
 						break;
 				}
