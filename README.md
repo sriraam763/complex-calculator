@@ -5,7 +5,7 @@ This is a replica of a scientific calculator app, made using the Java programmin
  - Mohamed Junaid Chaudhry - 166335
  - Shadrack Mungai - 152522
  - Jimmy Kariuki Kimotho - 169767
- - Eric Musyimi Mutunga
+ - Eric Musyimi Mutunga - 168956
 
 ## Guidlines Provided:
 - [x] Functioning Elementary operations
