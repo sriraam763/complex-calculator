@@ -10,7 +10,7 @@ import ui.ButtonTexts;
 import ui.CustomButton;
 import ui.Theme;
 
-public class ScientificInput extends JPanel {
+public class ScientificInput {
 	/**
 	 * List of all the buttons.
 	 */
@@ -53,12 +53,12 @@ public class ScientificInput extends JPanel {
 	 */
 	private CustomButton button_arr[] = new CustomButton[buttons.length];
 
-	public ScientificInput() {
+	public ScientificInput(JPanel parent) {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
-		setLayout(new GridBagLayout());
+		// parent.setLayout(new GridBagLayout());
 
 		createButtons();
 
@@ -114,23 +114,23 @@ public class ScientificInput extends JPanel {
 		for (int i = 0; i < button_arr.length - 4; i++) {
 			gbc.gridx = i % 5;
 			gbc.gridy = i / 5;
-			add(button_arr[i], gbc);
+			parent.add(button_arr[i], gbc);
 		}
 
 		gbc.gridy++;
 		gbc.gridx = 0;
 		gbc.gridwidth = 2;
-		add(button_arr[20], gbc);
+		parent.add(button_arr[20], gbc);
 
 		gbc.gridx += 2;
 		gbc.gridwidth = 1;
-		add(button_arr[21], gbc);
+		parent.add(button_arr[21], gbc);
 		gbc.gridx++;
-		add(button_arr[22], gbc);
+		parent.add(button_arr[22], gbc);
 		gbc.gridx++;
-		add(button_arr[23], gbc);
+		parent.add(button_arr[23], gbc);
 
-		setBackground(Theme.BG_COLOR);
+		parent.setBackground(Theme.BG_COLOR);
 	}
 
 	private void createButtons() {

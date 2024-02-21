@@ -31,6 +31,8 @@ public class BasicInput extends JPanel {
 
 	private JTextField textField = Parser.textField;
 
+	public static boolean showScientific = true;
+
 	/**
 	 * Array of all the buttons.
 	 */
@@ -42,6 +44,11 @@ public class BasicInput extends JPanel {
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		setLayout(new GridBagLayout());
+
+		// Create the scientific layout
+		if (showScientific) {
+			new ScientificInput(this);
+		}
 
 		createButtons();
 
@@ -84,15 +91,16 @@ public class BasicInput extends JPanel {
 
 		// button_arr[1].setFont(new Font(Font.MONOSPACED, Font.PLAIN, 18));
 
+		int space = showScientific ? 5 : 0;
 		for (int i = 0; i < buttons.length - 3; i++) {
-			gbc.gridx = i % 4;
+			gbc.gridx = space + (i % 4);
 			gbc.gridy = i / 4;
 
 			add(button_arr[i], gbc);
 		}
 
 		gbc.gridy++;
-		gbc.gridx = 0;
+		gbc.gridx = space;
 		gbc.gridwidth = 2;
 		add(button_arr[16], gbc);
 		gbc.gridx += 2;

@@ -17,7 +17,6 @@ import java.awt.event.*;
  * Main window layout.
  */
 public class Home extends JPanel {
-	private static boolean showScientific = false;
 	private GridBagConstraints gbc = new GridBagConstraints();
 
 	private void build() {
@@ -26,29 +25,16 @@ public class Home extends JPanel {
 		// Add the output bar for results.
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.gridwidth = showScientific ? 2:1;
 		gbc.weightx = 1;
 		gbc.weighty = 0.25;
 		Output output = new Output();
 		add(output, gbc);
 
 		// Add the input bar for all the buttons.
-		gbc.gridwidth = 1;
-		if (showScientific) {
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.weighty = 1;
-			add(new ScientificInput(), gbc);
-			gbc.gridx = 1;
-			gbc.gridy = 1;
-			gbc.weighty = 1;
-			add(new BasicInput(), gbc);
-		} else {
-			gbc.gridx = 0;
-			gbc.gridy = 1;
-			gbc.weighty = 1;
-			add(new BasicInput(), gbc);
-		}
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.weighty = 1;
+		add(new BasicInput(), gbc);
 
 		revalidate();
 	}
@@ -64,9 +50,9 @@ public class Home extends JPanel {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				if (e.getComponent().getWidth() >= 800) {
-					showScientific = true;
+					BasicInput.showScientific = true;
 				} else {
-					showScientific = false;
+					BasicInput.showScientific = false;
 				}
 				build();
 			}
