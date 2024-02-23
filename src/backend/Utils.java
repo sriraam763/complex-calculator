@@ -30,7 +30,7 @@ public class Utils {
      * Array for all functions.
      */
     public final static String FUNCTIONS[] = {
-            "atanh", "asinh", "acosh", "tanh", "sinh", "cosh", "atan", "asin", "acos", "tan", "sin", "cos", "log", "ln",
+            "tanh⁻¹", "sinh⁻¹", "cosh⁻¹", "sin⁻¹", "cos⁻¹", "tan⁻¹", "tanh", "sinh", "cosh", "tan", "sin", "cos", "log", "ln",
             "("
     };
 

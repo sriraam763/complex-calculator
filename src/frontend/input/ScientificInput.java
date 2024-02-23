@@ -42,8 +42,8 @@ public class ScientificInput {
 			"(", ")", "^2", "^3", "^",
 			"^-1", "2√", "3√", "√", "!",
 			"ln(", "log(", "e^", "10^", "e",
-			"", "π", "asin(", "acos(", "atan(",
-			"rad", "asinh(", "acosh(", "atanh(",
+			"", "π", "sin⁻¹(", "cos⁻¹(", "tan⁻¹(",
+			"rad", "sinh⁻¹(", "cosh⁻¹(", "tanh⁻¹(",
 	};
 
 	private JTextField textField = Parser.textField;

@@ -67,7 +67,7 @@ public class Parser {
         }
     }
 
-    public static BigDecimal calculate() throws NumberFormatException {
+    public static BigDecimal calculate() {
         clear_output = true;
         if (textField.getText().isEmpty()) {
             ans.subtract(ans);
@@ -80,14 +80,14 @@ public class Parser {
             infix = checkSyntaxErrors();
         } catch (NumberFormatException e) {
             textField.setText("Syntax Error!");
-            throw new NumberFormatException("Syntax error");
+            return BigDecimal.valueOf(0);
         }
 
         try {
             ans = postfixParse(infixToPostfix(infix));
         } catch (Exception e) {
             textField.setText("Math Error!");
-            throw new NumberFormatException("Math error");
+            return BigDecimal.valueOf(0);
         }
 
         History.storeCalcs.add(textField.getText());
@@ -403,7 +403,7 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
-                    case "asin":
+                    case "sin⁻¹":
                         value = Math.asin(num.doubleValue());
                         if (!radians) {
                             value = Math.toDegrees(value);
@@ -414,7 +414,7 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
-                    case "acos":
+                    case "cos⁻¹":
                         value = Math.acos(num.doubleValue());
                         if (!radians) {
                             value = Math.toDegrees(value);
@@ -425,7 +425,7 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
-                    case "atan":
+                    case "tan⁻¹":
                         value = Math.atan(num.doubleValue());
                         if (!radians) {
                             value = Math.toDegrees(value);
@@ -460,7 +460,7 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
-                    case "asinh":
+                    case "sinh⁻¹":
                         value = Math.log(num.doubleValue() + Math.sqrt(num.pow(2).doubleValue() + 1));
                         if (Double.isNaN(value)) {
                             throw new Exception("Math error");
@@ -468,7 +468,7 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
-                    case "acosh":
+                    case "cosh⁻¹":
                         value = Math.log(num.doubleValue() + Math.sqrt(num.pow(2).doubleValue() - 1));
                         if (Double.isNaN(value)) {
                             throw new Exception("Math error");
@@ -476,7 +476,7 @@ public class Parser {
                         stack.push(new BigDecimal(value));
                         break;
 
-                    case "atanh":
+                    case "tanh⁻¹":
                         value = 0.5 * Math.log((1 + num.doubleValue()) / (1 - num.doubleValue()));
                         if (Double.isNaN(value)) {
                             throw new Exception("Math error");
