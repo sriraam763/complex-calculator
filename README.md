@@ -1,6 +1,8 @@
 # Java Calculator Assignment
 This is a replica of a scientific calculator app, made using the Java programming language along with the Swing and AWT library as part of the end of semester assignment.  
 
+**Note:** This is a fork of the original group project with my own updates made after the deadline. The original project can be found here: [Java-Calculator](https://github.com/shady-mungai/Java-Calculator).
+
 ## Guidlines Provided:
 - [x] Functioning Elementary operations
 - [x] Working Constants (e.g. 𝑃𝑖 and 𝑒)
@@ -16,6 +18,8 @@ The project was aimed to look similar to the following UI as per instructions:
 
 The final app looks like this:
 ![Final.png](images/Final.png)
+
+**Note:** The above was run in GNOME Linux with custom themeing set to change the window title bar buttons and positions. Do not expect it to look the exact same on your machine/system.
 
 
 ## Notes
