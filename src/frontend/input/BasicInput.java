@@ -29,8 +29,10 @@ public class BasicInput extends JPanel {
 			"0", ".", "="
 	};
 
+	/** Reference to the global textfield */
 	private JTextField textField = Parser.textField;
 
+	/** Flag to indicate whether the scientific calculator buttons should be shown */
 	public static boolean showScientific = true;
 
 	/**
@@ -91,6 +93,7 @@ public class BasicInput extends JPanel {
 
 		// button_arr[1].setFont(new Font(Font.MONOSPACED, Font.PLAIN, 18));
 
+		/** Offset the calculator buttons if the scientific calculator is shown */
 		int space = showScientific ? 5 : 0;
 		for (int i = 0; i < buttons.length - 3; i++) {
 			gbc.gridx = space + (i % 4);
@@ -118,7 +121,7 @@ public class BasicInput extends JPanel {
 	private void createButtons() {
 		for (int i = 0; i < buttons.length; i++) {
 			button_arr[i] = new CustomButton(buttons[i]);
-			// What to do when you click the button.
+			// Set the action when the button is clicked
 			button_arr[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -128,6 +131,7 @@ public class BasicInput extends JPanel {
 					textField.setText(textField.getText() + text);
 				}
 			});
+			// Set the button to allow key input when the textfield isn't in focus
 			button_arr[i].addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyTyped(KeyEvent e) {
@@ -144,6 +148,7 @@ public class BasicInput extends JPanel {
 					} else if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 						Parser.calculate();
 					} else {
+						// Substitute certain characters
 						switch (e.getKeyChar()) {
 							case '*':
 								e.setKeyChar('x');

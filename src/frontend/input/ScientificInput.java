@@ -10,6 +10,7 @@ import ui.ButtonTexts;
 import ui.CustomButton;
 import ui.Theme;
 
+/** Scientific Input panel */
 public class ScientificInput {
 	/**
 	 * List of all the buttons.
@@ -22,6 +23,7 @@ public class ScientificInput {
 			ButtonTexts.rad, ButtonTexts.sinh, ButtonTexts.cosh, ButtonTexts.tanh
 	};
 
+	/** Flag to show if the shift key is down */
 	private static boolean shiftDown = false;
 
 	/**
@@ -46,6 +48,7 @@ public class ScientificInput {
 			"rad", "sinh⁻¹(", "cosh⁻¹(", "tanh⁻¹(",
 	};
 
+	/** Reference to the global textfield */
 	private JTextField textField = Parser.textField;
 
 	/**
@@ -53,12 +56,16 @@ public class ScientificInput {
 	 */
 	private CustomButton button_arr[] = new CustomButton[buttons.length];
 
+	/**
+	 * Set the scientific input panel
+	 * 
+	 * @param parent Parent panel to add buttons to
+	 */
 	public ScientificInput(JPanel parent) {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.weightx = 1;
 		gbc.weighty = 1;
-		// parent.setLayout(new GridBagLayout());
 
 		createButtons();
 
@@ -111,6 +118,7 @@ public class ScientificInput {
 			}
 		});
 
+		// Add the buttons to the grid bag layout
 		for (int i = 0; i < button_arr.length - 4; i++) {
 			gbc.gridx = i % 5;
 			gbc.gridy = i / 5;
@@ -133,10 +141,12 @@ public class ScientificInput {
 		parent.setBackground(Theme.BG_COLOR);
 	}
 
+	/** Initializes the buttons */
 	private void createButtons() {
 		for (int i = 0; i < buttons.length; i++) {
 			button_arr[i] = new CustomButton(buttons[i]);
 			final int index = i;
+			// Set the action when the button is clicked
 			button_arr[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -145,6 +155,8 @@ public class ScientificInput {
 							textField.getText() + (shiftDown ? substituteTextShifted[index] : substituteText[index]));
 				}
 			});
+
+			// Set the button to allow key input when the textfield isn't in focus
 			button_arr[i].addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyTyped(KeyEvent e) {
@@ -161,6 +173,7 @@ public class ScientificInput {
 					} else if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 						Parser.calculate();
 					} else {
+						// Substitute certain characters
 						switch (e.getKeyChar()) {
 							case '*':
 								e.setKeyChar('x');

@@ -14,24 +14,16 @@ import java.util.Stack;
 import javax.swing.JTextField;
 
 public class Parser {
-    /**
-     * Text field output.
-     */
+    /** Global text field output  */
     public static JTextField textField = new JTextField();
 
-    /**
-     * Determines whether to clear the output or not.
-     */
+    /** Determines whether to clear the output or not. */
     public static boolean clear_output = false;
 
-    /**
-     * Strores the last result.
-     */
+    /** Strores the last result.*/
     public static BigDecimal ans = new BigDecimal(0);
 
-    /**
-     * Flag indicating radians or degrees mode.
-     */
+    /** Flag indicating radians or degrees mode.*/
     public static boolean radians = true;
 
     /**
@@ -60,6 +52,7 @@ public class Parser {
         }
     }
 
+    /** Clear the output of the textfield */
     public static void clearOutput() {
         if (clear_output) {
             textField.setText("");
@@ -67,15 +60,25 @@ public class Parser {
         }
     }
 
+    /** 
+     * Calculate the expression in the textfield.
+     * 
+     * @apiNote Also checks for syntax and math errors. Saves the result in memory.
+     * 
+     * @return
+     */
     public static BigDecimal calculate() {
         clear_output = true;
+
+        // Do nothing if the textfield is empty
         if (textField.getText().isEmpty()) {
             ans.subtract(ans);
             textField.setText("");
             return new BigDecimal(0);
         }
 
-        String infix[];
+        /** Stores infix expression from textfield */
+        String infix[]; 
         try {
             infix = checkSyntaxErrors();
         } catch (NumberFormatException e) {
@@ -83,6 +86,7 @@ public class Parser {
             return BigDecimal.valueOf(0);
         }
 
+        // Calculate the expression
         try {
             ans = postfixParse(infixToPostfix(infix));
         } catch (Exception e) {
@@ -90,6 +94,7 @@ public class Parser {
             return BigDecimal.valueOf(0);
         }
 
+        // Add the expression to the history buffer
         History.storeCalcs.add(textField.getText());
         if (History.storeCalcs.size() > 15) {
             History.storeCalcs.removeFirst();
@@ -562,6 +567,11 @@ public class Parser {
         return stack.pop();
     }
 
+    /**
+     * Determine if a number is an integer or not
+     * @param num
+     * @return
+     */
     private static boolean isInt(double num) {
         return num == Math.round(num);
     }

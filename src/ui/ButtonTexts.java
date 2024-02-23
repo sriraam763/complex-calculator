@@ -1,5 +1,6 @@
 package ui;
 
+/** Text to show for each button elements */
 public class ButtonTexts {
     public static final String x_sqr = "<html>x<sup style='font-size:20pt'>2<sup></html>";
     public static final String x_cube = "<html>x<sup style='font-size:20pt'>3<sup></html>";

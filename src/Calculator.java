@@ -4,11 +4,7 @@ import frontend.Home;
 
 import java.awt.*;
 
-/**
- * Calculator
- * 
- * Main
- */
+/** Main entry point to the app. */
 public class Calculator extends JFrame {
     /**
      * Constructor to build and run the app.

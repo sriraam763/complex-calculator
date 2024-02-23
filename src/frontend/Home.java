@@ -19,6 +19,7 @@ import java.awt.event.*;
 public class Home extends JPanel {
 	private GridBagConstraints gbc = new GridBagConstraints();
 
+	/** Add all the components to the UI */
 	private void build() {
 		removeAll();
 
@@ -46,14 +47,17 @@ public class Home extends JPanel {
 
 		build();
 
+		/** Add a listener to check when the window is resized */
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
+				// Set the window to show the scientific calculator if there is enough space
 				if (e.getComponent().getWidth() >= 800) {
 					BasicInput.showScientific = true;
 				} else {
 					BasicInput.showScientific = false;
 				}
+				// Rebuild the UI
 				build();
 			}
 		});
