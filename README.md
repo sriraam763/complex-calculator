@@ -1,12 +1,6 @@
 # Java Calculator Assignment
 This is a replica of a scientific calculator app, made using the Java programming language along with the Swing and AWT library as part of the end of semester assignment.  
 
-## Group Members:
- - Mohamed Junaid Chaudhry - 166335
- - Shadrack Mungai - 152522
- - Jimmy Kariuki Kimotho - 169767
- - Eric Musyimi Mutunga - 168956
-
 ## Guidlines Provided:
 - [x] Functioning Elementary operations
 - [x] Working Constants (e.g. 𝑃𝑖 and 𝑒)
@@ -19,6 +13,9 @@ This is a replica of a scientific calculator app, made using the Java programmin
 
 The project was aimed to look similar to the following UI as per instructions:
 ![UI.png](images/UI.png)
+
+The final app looks like this:
+![Final.png](images/Final.png)
 
 
 ## Notes
